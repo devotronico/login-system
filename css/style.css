@@ -1,0 +1,24 @@
+body {
+    background-color:#666;
+    /* height: 100%; */
+}
+
+
+.container {
+    height: 100vh;
+    padding: 50px;
+    background-color: #aaa;
+}
+
+
+.wrapper {
+    padding: 50px;
+    border: 1px solid rgba(0, 0, 0, .1);
+    border-radius: 4px;
+    background-color: #fff;
+}
+
+/* 
+form {
+    background-color: #fff;
+} */
