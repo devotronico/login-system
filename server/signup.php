@@ -1,20 +1,10 @@
 <?php
+if ( !isset($_POST) ) { header("Location: index.php"); die; } 
 
 header( "Content-type: application/json" );
 
-// https://github.com/redeluni/blog/blob/master/app/models/Signup.php
 
- 
-if ( !isset($_POST) ) {
-   header("Location: index.html");
-   die;
-} 
-
-
-if(!filter_has_var(INPUT_POST, 'signup')){
-    die('{ "status": "error", "error": "variabile POST con indice signup non trovata"}');
-}
-
+if(!filter_has_var(INPUT_POST, 'signup')){ die('{ "status": "error", "error": "variabile POST con indice signup non trovata"}'); }
 
 
 
@@ -33,7 +23,7 @@ $password = $obj->pass;
 require "model/Validation.php";
 
 
-if ( Validation::validateEmail($email) && Validation::validatePassword($password) ){
+if ( Validation::validateName($name) && Validation::validateEmail($email) && Validation::validatePassword($password) ){
 
     signup($name, $email, $password);
 }
@@ -51,7 +41,7 @@ if ( Validation::validateEmail($email) && Validation::validatePassword($password
  * password ( typo: VARCHAR, length: 255, esempio: $2y$10$KimdfbZihiepECDtVLZPBu9.VFgj.Y.GQAceGLPvn89ZiFnQgg4ji )    
  *  descrizione: archiviare il risultato in una colonna del database in grado di espandersi oltre i 60 caratteri (255 caratteri sarebbero una buona scelta).                        
  * registered ( typo: DATE, length: 10, format: yyyy-mm-dd 00:00:00 )
- * activation_key ( typo: VARCHAR, length: 32, format: [a-z0-9]{32} )
+ * hash ( typo: VARCHAR, length: 32, format: [a-z0-9]{32} )
  * verified ( typo: BOOLEAN, length: 1 )
  */
 function signup($name, $email, $password){
@@ -59,7 +49,7 @@ function signup($name, $email, $password){
     $status = 'utente';
     $password= password_hash($password, PASSWORD_DEFAULT); 
     $registered = date('Y-m-d H:i:s');
-    $activation_key = md5(strval(rand(0, 1000))); 
+    $hash = md5(strval(rand(0, 1000))); 
     $verified = 0;
     
     require "db.php";
@@ -69,7 +59,7 @@ function signup($name, $email, $password){
         die('{ "status": "error", "error": "La connessione al server è chiusa" }');
     }
 
-    $sql = "INSERT INTO users ( status, name, email, password, registered, activation_key, verified ) VALUES ( ?, ?, ?, ?, ?, ?, ? )"; 
+    $sql = "INSERT INTO users ( status, name, email, password, registered, hash, verified ) VALUES ( ?, ?, ?, ?, ?, ?, ? )"; 
     
     if ( $stmt = $mysqli->prepare($sql) ) {
 
@@ -80,7 +70,7 @@ function signup($name, $email, $password){
         $param3 = $email;
         $param4 = $password;
         $param5 = $registered;
-        $param6 = $activation_key;
+        $param6 = $hash;
         $param7 = $verified;
 
         if ( $stmt->execute() ) {
@@ -88,10 +78,23 @@ function signup($name, $email, $password){
             $righe_generate = $mysqli->affected_rows;
             $ultimo_ID_inserito = $mysqli->insert_id;
 
-            $Email = Email::verify($email, $activation_key, $name);
-            $test = $Email->send();
+            if( file_exists('model/EmailSubscription.php') ) {
 
-            die('{ "status": "success", "success": "Inserite '.$righe_generate.' riga nel database con id '. $ultimo_ID_inserito.'" }');
+                require "model/EmailSubscription.php"; 
+
+                if ( class_exists("EmailSubscription") ) {
+
+                    $emailSubscription = new EmailSubscription($name, $email, $hash);
+                    $emailSubscription->send();
+                    die('{ "status": "success", "success": "Inserite '.$righe_generate.' riga nel database con id '. $ultimo_ID_inserito.'" }');
+                } else {
+                    die('{ "status": "error", "error": "Errore nella con la classe EmailSubscription" }');
+                }
+            } else {
+                    die('{ "status": "error", "error": "Errore il file non esiste" }');
+            }
+            
+
        
         } else { die('{ "status": "error", "error": "Impossibile inserire nuove righe nel database - execute" }'); }
 

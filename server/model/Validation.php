@@ -112,18 +112,20 @@ public static function validatePassword($password)
  * VALIDATE NAME
  * fa la validazione al nome dell' utente
  * TO-DO: validare anche i simboli: ' "
+ * $illegal = "#$%^&*()+=-[]';,./{}|:<>?~";
+ * echo (false === strpbrk($YourCsvVarible, $illegal)) ? 'Allowed' : "Disallowed";
+ * $illegal = "€#$%^&*()+=-[]';,./{}|:<>?~";
+ * $illegal = \€\#\$\%\^\&\*\(\)\+\=\-\[\]\'\;\,\.\/\{\}\|\:\<\>\?\~
  */
-    public function validateName($str) {
-        if ( !empty($str) ) {
-            if (preg_match('/^[a-zA-Z]{32}$/', $str)) {
-                return $str;
-            } else {
-                return 'nome invalido!'; 
-            }
-        } else {
-            return 'senza nome';
-        }
-    }
+public function validateName($name) {
+    if ( empty($name) ) {  die('{ "status": "error", "error": "Il campo nome è vuoto." }'); }
+
+    $illegal = "@[\€\#\$\%\^\&\*\(\)\+\=\-\[\]\'\;\,\.\/\{\}\|\:\<\>\?\~]@";
+    if ( preg_match($illegal, $name, $matches) ) {  die('{ "status": "error", "error": "Il carettere '.$matches[0].' non è valido" }'); }
+    // if ( preg_match($illegal, $name, $matches) ) {  die('{ "status": "error", "error": "Il carettere  non è valido" }'); }
+    return $name;
+    //  die('{ "status": "error", "error": "Il carettere '.$matches[0].' non è valido" }');
+}
 
 
 

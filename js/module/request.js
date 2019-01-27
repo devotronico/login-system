@@ -2,7 +2,7 @@
 function request(file, data=null){
 
     return new Promise((resolve, reject) =>{
-
+// var xhr = typeof XMLHttpRequest != 'undefined' ? new XMLHttpRequest() : new ActiveXObject('Microsoft.XMLHTTP');
     const xhttp = new XMLHttpRequest();
 
     xhttp.onreadystatechange = function(){
@@ -13,16 +13,7 @@ function request(file, data=null){
     
             let obj = JSON.parse(str);   console.log(obj);
     
-         /*
-            if(obj.hasOwnProperty("success")){
-               // console.log(obj.action);
-                switch ( obj.action ) {
-                    case "count":  console.log("count"); break;
-                    case "select":  console.log("select"); break;
-                }
-            }*/
 
-/*
             if(obj.hasOwnProperty("success")){
 
                 resolve("Success: "+obj.success);
@@ -30,24 +21,7 @@ function request(file, data=null){
             } else if(obj.hasOwnProperty("error")){ 
            
                  reject("Errore: "+obj.error );
-
-            } else if(obj.hasOwnProperty("empty")){ 
-
-                reject("Empty: "+obj.empty);
-                // clearTable(); 
-                //reject("Errore: "+obj.empty ); 
-            } else if(obj.hasOwnProperty("view")){ 
-
-                resolve(obj);   // fillViewModal(obj);  
-
-            } else if(obj.hasOwnProperty("count")){ 
-    
-                resolve(obj);
-            } else {
-             
-                resolve(obj);
-            }
-            */
+            } 
                  
         } else { reject("Errore code:"+this.status);}
     }

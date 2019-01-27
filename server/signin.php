@@ -1,23 +1,13 @@
 <?php
+
 header( "Content-type: application/json" );
 
 
-// https://github.com/redeluni/blog/blob/master/app/models/Signup.php
 
- //echo "SERVER"; die;
 
- 
- 
- 
- if ( !isset($_POST) ) {
-     header("Location: index.html");
-     die;
-    } 
+if ( !isset($_POST) ) { header("Location: /index.php"); die; } 
     
-if(!filter_has_var(INPUT_POST, 'signin')){
-    die('{ "status": "error", "error": "variabile POST con indice signin non trovata"}');
-}
-
+if(!filter_has_var(INPUT_POST, 'signin')){ die('{ "status": "error", "error": "variabile POST con indice signin non trovata" }'); }
 
 
 $str = $_POST["signin"];
@@ -28,7 +18,25 @@ $email = $obj->mail;
 $password = $obj->pass;
 
 
+require "model/Validation.php";
 
+
+if ( Validation::validateEmail($email) && Validation::validatePassword($password) ){
+
+    require "db.php";
+    //echo '{ "status": "error", "error": "4" }';
+    $user = login($email, $password, $mysqli);
+
+    if(session_status() === PHP_SESSION_NONE) session_start();
+
+    $_SESSION['id'] = $user->id;
+    $_SESSION['name'] = $user->name;
+    $_SESSION['email'] = $user->email;
+    // setcookie("user_id", $user['id'], time()+3600, '/');
+   
+    die('{ "status": "success", "success": "login avvenuto con successo" }');
+}
+ 
 
 
 /**
@@ -42,66 +50,35 @@ $password = $obj->pass;
  * Se 'user_status' è uguale a 0:        
  * allora  non potremo loggarci e il sistema ci invierà una mail per attivare il l'account       
  */
-function login($email, $password, $mysqli) 
-{
+function login($email, $password, $mysqli) {
+  
+    $sql = "SELECT * FROM users WHERE email = ?";
 
-    $sql = "SELECT * FROM users WHERE email = '{$email}'";
+    if ( $stmt = $mysqli->prepare($sql) ) {
 
-    if ( $result = $mysqli->query($sql) ) {
-
-        if ( $result->num_rows == 1 ) {
-
-          //  die ('{ "status": "success", "success": "login avvenuto con successo" }');
-
-            $user = $result->fetch_object(); // fetch_row() / fetch_object() / fetch_array
-          //  $user->view = 'modal';  //  print_r($user);
-         
-           // echo json_encode($data);
-
-
-
-/*
-                if ( password_verify($password, $user->password) ) {
-
-                        $_SESSION['id'] = $user->id;
-                        $_SESSION['name'] = $user->name;
-                       // setcookie("user_id", $user['id'], time()+3600, '/');
-               
-                } else {
-
-                    die('{ "status": "error", "error":  " La password non corrisponde all\' email '.$email.'" }');
-
-                 //   die("La password non corrisponde all' email <strong>$email</strong>.<br>");
-                }
-
-                */
-            } else {
-
-                die('{ "status": "error", "error":  "All\' email '.$email.' non risulta associato nessun account." }');
-            }
-        } else {
-
-            die('{ "status": "error", "error":  "Qualcosa è andato storto. Per favore prova più tardi." }');
-        }
+        $stmt->bind_param('s', $param );
         
+        $param = $email;
+        
+        if ( !$stmt->execute() ) { die('{ "status": "error", "error":  "Errore: execute" }'); }
+        
+        $result = $stmt->get_result();
+        
+        if($result->num_rows === 0) { die('{ "status": "error", "error":  "All\' email '.$email.' non risulta associato nessun account." }'); }
+        
+        $user = $result->fetch_object();
+
+        if ( !password_verify($password, $user->password) ) {  die('{ "status": "error", "error":  " La password non corrisponde all\' email '.$email.'" }'); }
+
+        return $user;
+
+    } else { 
+
+        die('{ "status": "error", "error": "Errore: prepare" }');
+    }
 }
 
 
 
 
-require "model/Validation.php";
 
-
-if ( Validation::validateEmail($email) && Validation::validatePassword($password) ){
-
-    require "db.php";
-
-    login($email, $password, $mysqli);
-
-   // if (isset($_SESSION['id'])) {
-
-        die ('{ "status": "success", "success": "login avvenuto con successo" }');
-  //  }
-}
- 
-   

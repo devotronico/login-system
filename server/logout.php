@@ -1,6 +1,36 @@
 <?php
+if ( !isset($_POST) ) {
+
+    header("Location: index.php"); die;
+} 
+
+header( "Content-type: application/json" );
+    
+
+/***************************************************************************************************|
+* LOGOUT    metodo = GET    route = auth/logout                                                     |
+* distruggiamo l'id della sessione e il valore di $_SESSION["user_id"] e $_SESSION["user_type"]     |
+* e distruggiamo il COOKIE                                                                          |
+****************************************************************************************************/
+function logout(){
+
+    if(session_status() === PHP_SESSION_NONE) session_start();
+    $_SESSION = array();
+    session_unset();
+    session_destroy();
+    die('{ "status": "success", "success": "logout avvenuto con successo 3" }');
+   
+    //setcookie("user_id", null);
+    //setcookie("user_id", null, time()-3600, '/');
+}
 
 
+logout();
+
+
+
+
+/*
 
 function json_response($message = null, $code = 200)
 {
@@ -50,3 +80,4 @@ echo json_response(200, array(
 // {"status":true,"message":{"data":[1,2,3]}}
 // usage with error
 echo json_response(500, 'Server Error! Please Try Again!'); // {"status":false,"message":"Server Error! Please Try Again!"}
+*/
