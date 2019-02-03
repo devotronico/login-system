@@ -2,19 +2,32 @@
 if(session_status() === PHP_SESSION_NONE) session_start();
 // session_start();
 // ttdnjfqrubatgukpjl40ccq01o
-
 //echo $_SERVER["PHP_SELF"]; // /login-system/index.php
 //if ( count($_SESSION) ) { echo "ci sono ".count($_SESSION)." cookie"; } else { echo "0"; } // 0
+/*
 if ( count($_COOKIE) ) { echo "ci sono " .count($_COOKIE). " cookie"; } else { echo "0"; } // 0
 echo "<br>";
 if(filter_has_var(INPUT_COOKIE, 'id')) {  echo "cookie id: ".$_COOKIE["id"]; } else { echo "nessun cookie id"; } // 0
 echo "<br>";
 if ( count($_SESSION) ) { echo "L' array SESSION è attivo"; } else {  echo "L' array SESSION NON è attivo"; }
 echo "<br>";
-echo SID;
-echo "<br>";
 echo "<pre>";print_r($_SESSION);echo "</pre>"; // array vuoto
 if ( isset($_SESSION["id"]) )  {  echo "session id: ".$_SESSION["id"]; } else { echo "nessun session id"; } // 0
+
+*/
+
+/*
+echo "<br><br><br>"; 
+$site = (isset($_SERVER['HTTPS']) ? "https" : "http"); // http
+echo $site;
+echo "<br>"; 
+$site = (isset($_SERVER['HTTPS']) ? "https" : "http") . "://".$_SERVER['HTTP_HOST']; // http://localhost
+echo $site;
+echo "<br>"; 
+$site = (isset($_SERVER['HTTPS']) ? "https" : "http") . "://".$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']; // http://localhost/job-01/
+echo $site;
+*/
+
 /*
 
 $_SESSION["id"] = htmlentities($);
@@ -48,8 +61,12 @@ unserialize();
 
 
 /**
- * 
+ * SIGNUP VERIFY     metodo = GET   route = auth/signup/verify    COOKIE 
+ * Quando all'interno della Mail clicchiamo il link verremo indirizzati di nuovo sul sito per
+ * verificare se i parametri del link siano validi e se l'account non era già stato attivato. 
+ * Se è andato tutto bene verremo loggati   
  */
+/*
 $messageRegistration = "";
 if(!filter_has_var(INPUT_COOKIE, 'id')){
 
@@ -59,12 +76,7 @@ if(!filter_has_var(INPUT_COOKIE, 'id')){
         $email = $_GET["email"];
         $hash = $_GET["hash"];
 
-        /**
-         * SIGNUP VERIFY     metodo = GET   route = auth/signup/verify    COOKIE 
-         * Quando all'interno della Mail clicchiamo il link verremo indirizzati di nuovo sul sito per
-         * verificare se i parametri del link siano validi e se l'account non era già stato attivato. 
-         * Se è andato tutto bene verremo loggati   
-         */
+    
         function signupVerify($email, $hash){  
 
             require "server/db.php";
@@ -87,7 +99,7 @@ if(!filter_has_var(INPUT_COOKIE, 'id')){
         // die;
     }
 } 
-
+*/
 
 
  
@@ -98,19 +110,13 @@ if ( $_GET["email"] && $_GET["hash"] ) {
 // $message = "ciao"; die($message);
     // die('{ "status": "error", "error": "variabile GET  con indice signup non trovata"}');
 
-
-
  /*
-
- 
  $obj = json_decode($str); // echo '<pre>';var_dump( $obj ); die;// object(stdClass)
  
  $name = $obj->name;
  $email = $obj->mail;
  $password = $obj->pass;
-
-
-   <p id="message-registration" style="display:<?= isset($messageRegistration) ? 'block' : 'none' ?>"><?=$messageRegistration?></p>
+<p id="message-registration" style="display:<?= isset($messageRegistration) ? 'block' : 'none' ?>"><?=$messageRegistration?></p>
  */
 
 
@@ -124,6 +130,7 @@ if ( $_GET["email"] && $_GET["hash"] ) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <!-- <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous"> -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
     <link rel="stylesheet" href="css/style.css">
     <title>Login-System</title>
@@ -150,8 +157,11 @@ if ( $_GET["email"] && $_GET["hash"] ) {
             </nav>
 
    
-            <h1>Home</h1> 
-            <p id="message-registration"><?php echo $messageRegistration?></p>
+            <h1>home</h1> 
+
+            <?php if ( isset($_GET["result"]) && isset($_GET["message"]) ) : ?>
+            <div class="alert alert-<?=$_GET["result"]?>" role="alert"><?=$_GET["message"]?></div>
+            <?php endif; ?>
            
            
               
@@ -173,15 +183,18 @@ if ( $_GET["email"] && $_GET["hash"] ) {
                         <div class="form-group">
                             <label for="name-signup">Name</label>
                             <input type="text" class="form-control" id="name-signup" aria-describedby="nameHelp" placeholder="Enter name" autocomplete="username">
+                            <div class="alert alert-danger alert-name" role="alert" hidden></div>
                         </div>
                         <div class="form-group">
                             <label for="email-signup">Email address</label>
                             <input type="email" class="form-control" id="email-signup" aria-describedby="emailHelp" placeholder="Enter email" autocomplete="username">
+                            <div class="alert alert-danger alert-email" role="alert" hidden></div>
                         </div>
                         <div class="form-group">
                             <label for="password-signup">Password</label>
                             <input type="password" class="form-control" id="password-signup" placeholder="Password" autocomplete="current-password">
                             <small id="passwordHelp" class="form-text text-muted">We'll never share your password with anyone else.</small>
+                            <div class="alert alert-danger alert-password" role="alert" hidden></div>
                         </div>
                         <button type="submit" class="btn btn-primary bt" id="signup">Signup</button>
                     </form>

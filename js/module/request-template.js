@@ -1,4 +1,4 @@
-function loadTemplate(template){
+function requestTemplate(template){
 
     return new Promise((resolve, reject) =>{
 
@@ -8,7 +8,7 @@ function loadTemplate(template){
 
             if (xhr.readyState == 4 ) { 
 
-                if (xhr.status == 304 || xhr.status == 200) { 
+                if (this.status >= 200 && this.status < 300) { 
 
                     document.querySelector(".wrapper").innerHTML = xhr.responseText; 
                     //resolve(xhr.responseType);
@@ -20,23 +20,7 @@ function loadTemplate(template){
         }
         xhr.send();
     });
-    // return new Promise((resolve, reject) =>{
-
-    //     const xhr = typeof XMLHttpRequest != 'undefined' ? new XMLHttpRequest() : new ActiveXObject('Microsoft.XMLHTTP');
-    //     xhr.open('get', "layout/"+template, true);
-    //     xhr.onreadystatechange = function() {
-
-    //         if (xhr.readyState == 4 && xhr.status == 200) { 
-
-    //             document.querySelector(".wrapper").innerHTML = xhr.responseText; 
-    //             resolve("Success: html caricato");
-    //         } else {
-    //             reject("Errore: html non caricato" );
-    //         }
-    //     }
-    //     xhr.send();
-    // });
 }
 
 
-export { loadTemplate };
+export { requestTemplate };

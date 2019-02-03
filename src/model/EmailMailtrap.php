@@ -34,7 +34,7 @@ public function send(){
         $mail->Host = 'smtp.mailtrap.io';                       //smtp.gmail.com  // Specify main and backup SMTP servers
         $mail->SMTPAuth = true;                                 // Enable SMTP authentication
         $mail->Username = 'b34b7169adb122';                     // dmanzi83@gmail.com // SMTP username
-        $mail->Password = '8d0c925142f07b';                     // DMbr0l1@XIX83.google  // SMTP password
+        $mail->Password = '8d0c925142f07b';                     // SMTP password
         $mail->SMTPSecure = 'tls';                              // Enable TLS encryption, `ssl` also accepted
         $mail->Port = 465;    
         //Recipients

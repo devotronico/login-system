@@ -1,7 +1,7 @@
 <?php
 // https://github.com/PHPMailer/PHPMailer
 require "Email.php"; 
-require 'vendor/autoload.php'; //Load Composer's autoloader
+require '../vendor/autoload.php'; //Load Composer's autoloader
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
  
@@ -18,7 +18,7 @@ class EmailSubscription extends Email{
     public $titleTpl = 'Verifica il tuo indirizzo email'; 
     public $infoTpl = 'Per iniziare ad usare il tuo account devi confermare l\'indirizzo email';
     public $link;            
-    // private $template = 'email';     
+     
     // private $site;
     // private $titleTpl = 'Verifica il tuo indirizzo email'; 
     // private $infoTpl = 'Per iniziare ad usare il tuo account devi confermare l\'indirizzo email';
@@ -32,10 +32,12 @@ class EmailSubscription extends Email{
         parent::__construct($name, $email);
        
         //$this->site = (isset($_SERVER['HTTPS']) ? "https" : "http") . "://".$_SERVER['HTTP_HOST']; // https://www.danielemanzi.it/ ||| http://localhost:3000/
-        $this->site = "http://localhost/login-system/";
-        $this->link = $this->site."?email=".$email."&hash=".$hash; //http://localhost:3000/auth/verify/?email=dmanzi83@hotmail.it&hash=a597e50502f5ff68e3e25b9114205d4a
+        $this->site = (isset($_SERVER['HTTPS']) ? "https" : "http") . "://".$_SERVER['HTTP_HOST']; // "http://localhost/login-system/";
+        $uri = "/login-system/src/controller/registration.php/"; //  http://localhost/login-system/src/controller/registration.php
+        $this->link = $this->site.$uri."?email=".$email."&hash=".$hash; //http://localhost:3000/auth/verify/?email=dmanzi83@hotmail.it&hash=a597e50502f5ff68e3e25b9114205d4a
         // $this->link = $this->site.$route."?email=".$email."&hash=".$hash; //http://localhost:3000/auth/verify/?email=dmanzi83@hotmail.it&hash=a597e50502f5ff68e3e25b9114205d4a
         // $route = '/auth/signup/verify/';
+        // http://localhost/login-system/src/controller/signup.phpsrc/controller/registration.php?email=dan@mail.it&hash=3621f1454cacf995530ea53652ddf8fb
     }
       
   
@@ -96,8 +98,8 @@ public function send(){
         $mail->isHTML(true);                                  // Set email format to HTML
         $mail->Subject = $this->subject;  // Crea una nuova password // Benvenuto in danielemanzi.it // Account su danielemanzi.it cancellato
         // $body = "<h1>Email Inviata</h1>";  
-        if( file_exists("view/".$this->template.".tpl.php") ) {
-            $body = require 'view/'.$this->template.'.tpl.php';  
+        if( file_exists("../view/".$this->template.".tpl.php") ) {
+            $body = require '../view/'.$this->template.'.tpl.php';  
         } else { $body = "<h1>Email Inviata2</h1>";   }
         $mail->Body = $body; 
         $mail->AltBody = strip_tags($body);

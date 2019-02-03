@@ -42,7 +42,7 @@ public function accountActivation(){
             $param1 = $this->email;
             $param2 = $this->hash;
 
-            if ( !$stmt->execute() ) { return "Errore: execute in accountActivation"; }
+            if ( !$stmt->execute() ) { ["result"=>"danger", "message"=>"execute in accountActivation"]; }
 
             $result = $stmt->get_result();
 
@@ -55,20 +55,23 @@ public function accountActivation(){
                 $_SESSION['email'] = $user->email;
                 //setcookie("id", $user['id'], time()+3600, '/');
 
-                if ( $user->verified !== 0 ) { return "Questo account è già stato attivato"; }
+                if ( $user->verified !== 0 ) { return ["result"=>"warning", "message"=>"Questo account è già stato attivato da te"]; }
 
                 $sql = "UPDATE users SET verified = 1 WHERE id = ".$user->id;
 
-                if (!$stmt = $this->conn->prepare($sql)) { return "Errore: prepare in accountActivation"; }
+                if (!$stmt = $this->conn->prepare($sql)) { return ["result"=>"danger", "message"=>"prepare in accountActivation"]; }
 
-                if ( !$stmt->execute() ) { return "Errore: execute in accountActivation"; }
+                if ( !$stmt->execute() ) {  return ["result"=>"danger", "message"=>"execute in accountActivation"]; }
 
-                return "L' account è stato attivato"; 
+              //  return "L' account è stato attivato"; 
+                
+                return ["result"=>"success", "message"=>"Complimenti il tuo account è stato attivato"]; 
+
                 // return "L' account con id: ".$_SESSION["id"]." dell'utente ".$_SESSION["name"]." è stato attivato"; 
                 //return "Complimenti <strong>".$_SESSION['name']."</strong> la tua registrazione è avvenuta con successo!""; 
-            } else { return "email e hash non corrispondono"; }
+            } else {  return ["result"=>"warning", "message"=>"email e hash non corrispondono"]; }
            
-        } else { return "Errore: prepare in accountActivation"; }
+        } else { return ["result"=>"danger", "message"=>"prepare in accountActivation"]; }
         $stmt = null;
         $this->conn = null; 
 }

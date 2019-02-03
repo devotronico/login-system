@@ -1,5 +1,6 @@
 import { request } from "./module/request.js";
-import { loadTemplate } from "./module/request-template.js";
+
+import { requestTemplate } from "./module/request-template.js";
 
 //document.addEventListener('DOMContentLoaded', function() { 
     
@@ -41,16 +42,39 @@ function fn(e) {
          
             request(file , data)
             .then((success)=>{
+
                 console.log(success);
-                return loadTemplate('signup-email.tpl.html');
+                return requestTemplate('signup-email.tpl.html');
             })
             .then((html)=>{
 
                 console.log(html);
-                addEventToButton(); console.log(2);
-             
+                addEventToButton(); // console.log(2);
             })
-            .catch(err => console.log(err));
+            .catch(obj => { console.log(obj[0]) })
+
+                
+            //     const alerts = document.querySelectorAll(".alert");
+            //     for ( const a of alerts ) { a.hidden = true; }
+
+            //     for ( let i=0; i<obj.length; i++ ) {
+            //         // console.log(obj[i].status); //
+            //         // console.log(obj[i].error); //
+            //         // console.log(obj[i].message); //
+
+            //         const alert = document.querySelector(`.alert-${obj[i].error}`);
+            //         alert.hidden = false;
+            //         alert.innerHTML = obj[i].message;
+            //     }
+
+
+            //     // console.log(obj.status);
+            //     // console.log(obj.error);
+            //     // console.log(obj.message);
+              
+           
+
+            // });
         break;
 
 
