@@ -1,35 +1,49 @@
 <?php
 
+/**
+ * @author Daniele <dan@email.com>
+ * @category helper
+ * @return mixed
+ * @see
+ * @since 1.0.0
+ * @global
+ */
 class Validation
 {
 
     private $data;
     private $message = [];
 
-    public function __construct(array $data)
-    {
+    public function __construct(array $data) {
 
         $this->data = $data;
     }
 
-    public function validate()
-    {
+    public function validate() {
+
         foreach ($this->data as $key => $value) {
 
             switch ($key) {
-                case "name":$this->validateName($value);
+                case "name":
+                    $this->validateName($value);
                     break;
-                case "email":$this->validateEmail($value);
+                case "email":
+                    $this->validateEmail($value);
                     break;
-                case "password":$this->validatePassword($value);
+                case "password":
+                    $this->validatePassword($value);
                     break;
-
             }
         }
 
-        if (!empty($this->message)) {die(json_encode($this->message));}
+        if (!empty($this->message)) { return false; }
 
         return true;
+    }
+
+    public function getAllErrors() {
+
+        return $this->message;
     }
 
     // public function __construct(){}
@@ -42,7 +56,7 @@ class Validation
      * [2] /^([a-zA-Z0-9_.-])+@(([a-zA-Z0-9-])+.)+([a-zA-Z0-9]{2,4})+$/
      * [3] /^[-!#$%&'+/0-9=_A^AZ-z{|}?~].?!(\[-#$%&'?+/0-9= _A^AZ-z{|}~])*@[a-zA-Z](-?[a-zA-Z0-9])*(\.[a-zA-Z](-?[a-zA-Z0 -9])*)+$/
      *
-     * link utiliù:
+     * link utili:
      * https://stackoverflow.com/questions/2049502/what-characters-are-allowed-in-an-email-address
      * https://en.wikipedia.org/wiki/Email_address#Local-part
      * https://stackoverflow.com/questions/201323/how-to-validate-an-email-address-using-a-regular-expression
@@ -66,7 +80,7 @@ class Validation
      * DESCRIZIONE FUNZIONE:
      * fa una prima validificazione del 'email
      * Controlla: che non sia vuota e che abbia caratteri validi
-     * FILTER_SANITIZE_EMAIL
+     * FILTER_SANITIZE_EMAIL ( http://php.net/manual/en/filter.examples.sanitization.php )
      * Rimuove tutti i caratteri eccetto le lettere, i numeri e i caratteri !#$%&'*+-/=?^_`{|}~@.[]
      * Non sono considerate valide le email con i caratteri "\<>
      * ma lascia le virgolette singole ['] perciò non è sufficiente.
@@ -76,26 +90,22 @@ class Validation
      * prima della chiocciola      @()[]:<>\"
      * dopo la chiocciola          @$%&'*+/=?^_`{|}~()[]:<>\"
      */
-    public function validateEmail($email)
-    {
+    private function validateEmail($email){
         $email = trim($email);
         if (empty($email)) {
 
-            $this->message[] = ["status" => "error", "error" => "email", "message" => "Il campo email è vuoto"];
-
-            //die('{ "status": "error", "error": "email", "message": "Il campo email è vuoto" }');
+            $this->message[] = ['type' => 'email', 'message' => 'Il campo email è vuoto'];
         } else {
+
             $email = filter_var($email, FILTER_SANITIZE_EMAIL); // sanitized_email
-            if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
 
-                return true;
-            } else {
-                $this->message[] = ["status" => "error", "error" => "email", "message" => " $email non è un email valida"];
-
-                // die('{ "status": "error", "error": "email", "message": "' . $email . ' non è un email valida" }');
+                $this->message[] = ['type' => 'email', 'message' => $email .' non è un email valida'];
             }
         }
     }
+
+
 
 /**
  * VALIDATE PASSWORD
@@ -103,20 +113,20 @@ class Validation
  * Controlla se il valore della password è vuoto, ovvero se la password è stata digitata dall' utente
  * Controlla la lunghezza della password
  */
-    public function validatePassword($password)
-    {
+    private function validatePassword($password){
         $PASSWORD_LENGTH = 8;
         $password = trim($password);
         if (empty($password)) {
-            $this->message[] = ["status" => "error", "error" => "password", "message" => "Il campo password è vuoto"];
-            // die('{ "status": "error", "error": "password", "message": "Il campo password è vuoto." }');
+
+            $this->message[] = ['type' => 'password', 'message' => 'Il campo password è vuoto'];
+
         } else if (strlen($password) < $PASSWORD_LENGTH) {
-            $this->message[] = ["status" => "error", "error" => "password", "message" => "La password deve avere almeno $PASSWORD_LENGTH caratteri"];
-            // die('{ "status": "error", "error": "password", "message": "La password deve avere almeno ' . $PASSWORD_LENGTH . ' caratteri" }');
-        } else {
-            return true;
+
+            $this->message[] = ['type' => "password", 'message' => 'La password deve avere almeno '. $PASSWORD_LENGTH .' caratteri'];
         }
     }
+
+
 
 /**
  * VALIDATE NAME
@@ -125,24 +135,53 @@ class Validation
  * $illegal = "#$%^&*()+=-[]';,./{}|:<>?~";
  * echo (false === strpbrk($YourCsvVarible, $illegal)) ? 'Allowed' : "Disallowed";
  * $illegal = "€#$%^&*()+=-[]';,./{}|:<>?~";
- * $illegal = \€\#\$\%\^\&\*\(\)\+\=\-\[\]\'\;\,\.\/\{\}\|\:\<\>\?\~
+ * $illegal = "@[\€\#\$\%\@\^\&\*\(\)\+\=\-\[\]\'\;\,\.\/\{\}\|\:\<\>\?\~]@"
  */
-    public function validateName($name)
-    {
+    private function validateName($name){
         if (empty($name)) {
-            $this->message[] = ["status" => "error", "error" => "name", "message" => "Il campo nome è vuoto"];
-            //die('{ "status": "error", "error": "name", "message": "Il campo nome è vuoto" }');
+
+            $this->message[] = ['type' => 'name', 'message' => 'Il campo nome è vuoto'];
+        } else {
+            // $illegal = "/\W/";
+            $illegal = "/\€/";
+           // $illegal = "@[\€\#\$\%\@\^\&\*\(\)\+\=\-\[\]\'\;\,\.\/\{\}\|\:\<\>\?\~]@";
+            if (preg_match_all($illegal, $name, $output_array)) {
+
+                $char_listA = $output_array[0];
+
+                $fn = function (string $char) {
+
+                   // return (string)$char;
+                    return utf8_encode((string)$char); // funziona
+                   // return iconv('Windows-1252', 'UTF-8', $char);
+                   // return iconv("UTF-8", "ISO-8859-1//IGNORE", $char);
+                    // return utf8_encode((string)$n);
+                };
+
+                $char_listB = array_map($fn, $char_listA);
+
+
+
+                $chars = '<b>' .implode('</b> , <b>', $char_listB) . '</b>';
+               // $chars = utf8_encode((string)$chars);
+                if (count( $output_array[0]) > 1) {
+
+                    $this->message[] = ['type' => 'name', 'message' => 'I caratteri: '. $chars .' non sono validi'];
+                } else {
+
+                    $this->message[] = ['type' => 'name', 'message' => 'Il carattere '. $chars .' non è valido'];
+                }
+            }
+            /*
+
+            if (preg_match($illegal, $name, $matches)) {
+
+                $this->message[] = ['type' => 'name', 'message' => 'Il carettere '. $matches[0] .' non è valido'];
+            }
+            */
         }
-
-        $illegal = "@[\€\#\$\%\^\&\*\(\)\+\=\-\[\]\'\;\,\.\/\{\}\|\:\<\>\?\~]@";
-        if (preg_match($illegal, $name, $matches)) {
-            $this->message[] = ["status" => "error", "error" => "name", "message" => "Il carettere $matches[0] non è valido"];
-            //die('{ "status": "error", "error": "name", "message": "Il carettere ' . $matches[0] . ' non è valido" }');
-        }
-
-        return $name;
-
     }
+
 
     /**
      * VALIDATE HASH [metodo GET]
@@ -150,37 +189,32 @@ class Validation
      * all' utente durante la fase di registrazione del suo account
      * Controlla se sono validi i caratteri che compongono l' hash che otteniamo dall' url
      */
-    public function validateHash($hash)
-    {
-        if (preg_match('/^[a-f0-9]{32}$/', $hash)) {
+    private function validateHash($hash){
 
-            return $hash;
-        } else {
-            //  $this->message[] = ["status" => "error", "error" => "hash", "message" => "il parametro hash non è valido"];
+        if (!preg_match('/^[a-f0-9]{32}$/', $hash)) {
 
-            die('{ "status": "error", "error": "hash", "message": "il parametro hash non è valido" }');
-            // $this->message .= "il parametro hash non è valido";
+            $this->message[] = ['type' => 'hash', 'message' => 'il parametro hash non è valido'];
         }
     }
+
+
 
 /**
  * VALIDATE PHONE
  * Controlla se il numero di telefono immesso
  * dall' utente sia valido
  */
-    public function validatePhone($num)
-    {
-        if (!empty($num)) {
-            if (preg_match('/^[0-9]{15}$/', $num)) {
-                return $num;
-            } else {
-                $this->message[] = ["status" => "error", "error" => "phone", "message" => "numero di telefono invalido"];
-                //  return 'numero di telefono invalido!';
-            }
-        } else {
-            $this->message[] = ["status" => "error", "error" => "phone", "message" => "Il campo telefono è vuoto"];
-            // return 'senza telefono';
+    private function validatePhone($num){
+
+        if (empty($num)) {
+
+            $this->message[] = ['type' => 'phone', 'message' => 'Il campo telefono è vuoto'];
+        } else if (!preg_match('/^[0-9]{15}$/', $num)) {
+
+            $this->message[] = ['type' => 'phone', 'message' => 'numero di telefono invalido'];
         }
     }
+
+
 
 } // CHIUDE CLASSE

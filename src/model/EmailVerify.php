@@ -7,10 +7,11 @@ use PHPMailer\PHPMailer\Exception;
 
 
 
-class EmailSubscription extends Email{
+class EmailVerify extends Email
+{
 
-    private $subject = 'Registrazione';
-    private $buttonTpl = 'Verifica indirizzo email';
+    private $subject = 'Attivazione Account';
+    private $buttonTpl = 'Attiva il tuo account';
 
     // variabili per il template/body dell' email
     private $template = 'email';
@@ -19,21 +20,25 @@ class EmailSubscription extends Email{
     public $infoTpl = 'Per iniziare ad usare il tuo account devi confermare l\'indirizzo email';
     public $link;
 
-    // public function __construct(string $name, string $email, string $hash){
     public function __construct(array $user){
 
         $name = $user['name'];
         $email = $user['email'];
         $hash = $user['hash'];
 
+      //  die('{ "email": "'.$email.'" }');
+
         parent::__construct($name, $email);
 
+        //$this->site = (isset($_SERVER['HTTPS']) ? "https" : "http") . "://".$_SERVER['HTTP_HOST']; // https://www.danielemanzi.it/ ||| http://localhost:3000/
+        $this->site = (isset($_SERVER['HTTPS']) ? "https" : "http") . "://".$_SERVER['HTTP_HOST']; // "http://localhost/login-system/";
         $uri = "/login-system/src/controller/registration.php/"; //  http://localhost/login-system/src/controller/registration.php
         $this->link = $this->site.$uri."?email=".$email."&hash=".$hash; //http://localhost:3000/auth/verify/?email=dmanzi83@hotmail.it&hash=a597e50502f5ff68e3e25b9114205d4a
         // $this->link = $this->site.$route."?email=".$email."&hash=".$hash; //http://localhost:3000/auth/verify/?email=dmanzi83@hotmail.it&hash=a597e50502f5ff68e3e25b9114205d4a
         // $route = '/auth/signup/verify/';
         // http://localhost/login-system/src/controller/signup.phpsrc/controller/registration.php?email=dan@mail.it&hash=3621f1454cacf995530ea53652ddf8fb
     }
+
 
 
 
@@ -45,7 +50,7 @@ class EmailSubscription extends Email{
      * @param boolean $test
      * @return void
      */
-    public function send_($test=true){
+    public function send(bool $test=true){
 
         $mail = new PHPMailer(true);                                          // Passing `true` enables exceptions
         try {
@@ -80,11 +85,16 @@ class EmailSubscription extends Email{
 
 
 
-    /***************************|
+
+} // CHIUDE CLASSE
+
+
+
+/***************************|
 *    EMAIL INVIO [MAILTRAP] |
 ****************************/
-
-public function send() {
+/*
+public function send_(){
 
       $mail = new PHPMailer(true);                              // Passing `true` enables exceptions
       try {
@@ -115,15 +125,7 @@ public function send() {
             echo 'Invio email fallito! Errore: ', $mail->ErrorInfo;
         }
 }
-
-
-
-
-} // CHIUDE CLASSE
-
-
-
-
+*/
 
 
 

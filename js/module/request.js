@@ -1,19 +1,19 @@
-import { deactivateButton, activateButton, singleError, multiError } from "./dom.js";
+import { deactivateButton, singleError, multiError, getFatalError, sendVerifiedEmail } from "./dom.js";
 
 
 // RICHIESTA FILE DI JSON --------------------------------------------------
 /**
- * 
+ *
  * @param {string} file - file php al quale fare la request
  * @param {string} data - stringa json da far processare lato backend
- * 
+ *
  * readyState values:
- * 0: request not initialized (.onerror) 
+ * 0: request not initialized (.onerror)
  * 1: server connection established
  * 2: request received
  * 3: processing request (.onprogress)
- * 4: request finished and response is ready (.onload) 
- * 
+ * 4: request finished and response is ready (.onload)
+ *
  * HTTP Status
  * 200: "OK"
  * 403: "Forbidden"
@@ -29,69 +29,70 @@ function request(file, data=null){
 
         switch ( this.readyState ) {
 
-            case 0:  console.log("readyState 0: "+xhttp.readyState); break;
-            
+            case 0: console.log("readyState 0: "+xhttp.readyState); break;
+
             case 1: console.log("readyState 1: "+xhttp.readyState);
 
-                deactivateButton('signup');
-                
-            break;
-          
+                deactivateButton(file);
+                break;
+
             case 2: console.log("readyState 2: "+xhttp.readyState); break;
-           
-            case 3: console.log("readyState 3: "+xhttp.readyState); 
-            
-            break;
-           
-            case 4: console.log("readyState 4: "+xhttp.readyState); 
-    
+
+            case 3: console.log("readyState 3: "+xhttp.readyState); break;
+
+            case 4: console.log("readyState 4: "+xhttp.readyState);
+
                 if (this.status >= 200 && this.status < 300) {
-    
-                    let str = xhttp.responseText; // contenuto ricevuto dal server
-        
+
+                    let str = xhttp.responseText;  console.log(str);
+
                     let obj = JSON.parse(str);   console.log(obj);
-        
+/*
                     if ( Array.isArray(obj) ) { // Se è un array di oggetti
 
-                        if (obj.some(e => e.status === 'error')) {
+                        if (obj.some(e => e.status === 'error')) { console.log("OK");
 
-                            activateButton('Signup');
                             multiError( obj );
-                            //reject( obj );
                         }
-                    } else {
+                    } else {  console.log("KO");
+*/
+                        if(obj.status === "success"){
 
-                        if(obj.hasOwnProperty("success")){
+                            resolve(obj.message);
 
-                            resolve("Success: "+obj.success);
-                        
-                        } else if(obj.hasOwnProperty("error")){ 
-                           
-                            activateButton('Signup');
-                            singleError(obj);
-                            // reject( "ERROR: "+obj.error );
+                        } else if(obj.status === "error"){
 
-                        } else if(obj.hasOwnProperty("test")){ 
-                    
-                            activateButton('Signup');
-                            reject("TEST: "+obj.test );
-                        } 
-                    }
-                    
-                } else {  
+                            switch (parseInt(obj.code, 10)){
 
-                    activateButton('Signup');
+                            case -30: getFatalError(obj, 'contattare lo sviluppatore'); break;
+                            case -20: getFatalError(obj, 'contattare lo sviluppatore'); break;
+                            case -10:
+                                switch (obj.type){
+                                    case "verified": sendVerifiedEmail(obj); break;
+                                    case "email": singleError(obj); break;
+                                    case "bug": reject("BUG: "+obj.bug ); break;
+                                    case "test": reject("TEST: "+obj.message ); break;
+                                    default: singleError(obj);
+                                }
+                            break;
+                            }
+                        } else if(obj[0].status === "errors"){
+
+                            multiError(obj);
+                        }
+                   // }
+                } else {
+                    //activateButton(obj.page);
                     reject("Errore code:"+this.status);
                 }
-  
         break;
         }
     };
-    xhttp.open("POST", "src/controller/"+file, true);
+    xhttp.open("POST", "src/controller/"+file+".php", true);
     xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
     xhttp.send(data);
     });
 }
-    
+
 
 export { request };

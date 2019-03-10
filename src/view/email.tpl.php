@@ -1,13 +1,13 @@
 <?php
 return <<<HTML
 <html>
-    <head><meta charset="utf-8"></head>    
+    <head><meta charset="utf-8"></head>
     <body>
-    <table cellpadding="0" width="580" cellspacing="0" border="0" bgcolor="#F4F7FA" align="center" style="margin:0 auto;table-layout:fixed" bgcolor="blue">      
-        <tbody>  
-            <tr> 
+    <table cellpadding="0" width="580" cellspacing="0" border="0" bgcolor="#F4F7FA" align="center" style="margin:0 auto;table-layout:fixed" bgcolor="blue">
+        <tbody>
+            <tr>
                 <td colspan="4">
-                
+
                     <table width="100%" cellpadding="0" cellspacing="0" border="0">
                         <tbody>
                             <tr>
@@ -17,7 +17,7 @@ return <<<HTML
                                 <td valign="top" align="center">
                                     <a href="$this->site" style="display:inline-block;text-align:center" target="_blank">
                                         <img src="https://i.imgur.com/O1RM2ys.png" height="32" border="0" alt="$this->site">
-                                    </a>  
+                                    </a>
                                 </td>
                             </tr>
                             <tr>
@@ -25,7 +25,7 @@ return <<<HTML
                             </tr>
                         </tbody>
                     </table>
-                            
+
                     <table width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#ffffff" style="border-radius:4px">
                         <tbody>
                             <tr>
@@ -38,12 +38,12 @@ return <<<HTML
                                             <tr>
                                                 <td align="center" valign="bottom" colspan="2" cellpadding="3">
                                                     <img alt="email" width="80" src="https://i.imgur.com/UiZ2ObP.png">
-                                                </td>         
+                                                </td>
                                             </tr>
                                             <tr><td height="30"></td></tr>
                                             <tr>
                                                 <td align="center">
-                                                    <span style="color:#48545d;font-size:22px;line-height:24px">$this->titleTpl</span>               
+                                                    <span style="color:#48545d;font-size:22px;line-height:24px">$this->titleTpl</span>
                                                 </td>
                                             </tr>
                                             <tr><td height="24"></td></tr>
@@ -54,7 +54,7 @@ return <<<HTML
                                             <tr>
                                                 <td align="center">
                                                     <span style="color:#48545d;font-size:14px;line-height:24px">
-                                                    $this->infoTpl   
+                                                    $this->infoTpl
                                                     </span>
                                                 </td>
                                             </tr>
@@ -91,7 +91,7 @@ return <<<HTML
                             </tr>
                         </tbody>
                     </table>
-                                                        
+
                     <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:20px">
                         <tbody>
                             <tr>
@@ -110,15 +110,15 @@ return <<<HTML
                                     <span style="padding:5px;">
                                         <a href="" target="_blank">
                                             <img src="https://i.imgur.com/hPqFLPE.png" height="40" border="0" alt="iOS app mobile">
-                                        </a>  
-                                    </span>  
-                                </td>   
+                                        </a>
+                                    </span>
+                                </td>
                                 <td valign="top">
                                     <span style="padding:5px;">
                                         <a href="" target="_blank">
                                             <img src="https://i.imgur.com/k6mZR2h.png" height="40" border="0" alt="Android app mobile">
-                                        </a> 
-                                    </span> 
+                                        </a>
+                                    </span>
                                 </td>
                             </tr>
                             <tr>
@@ -126,7 +126,7 @@ return <<<HTML
                             </tr>
                         </tbody>
                     </table>
-                                
+
                     <table width="100%" cellpadding="0" cellspacing="0" border="0">
                         <tbody>
                             <tr>
@@ -144,11 +144,11 @@ return <<<HTML
                             </tr>
                         </tbody>
                     </table>
-                    
-                </td>  
+
+                </td>
             </tr>
-        </tbody>       
-    </table> 
+        </tbody>
+    </table>
     </body>
 </html>
 HTML;

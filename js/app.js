@@ -2,21 +2,20 @@ import { request } from "./module/request.js";
 
 import { requestTemplate } from "./module/request-template.js";
 
-//document.addEventListener('DOMContentLoaded', function() { 
-    
+//document.addEventListener('DOMContentLoaded', function() {
+
 let file, mail, pass, dataObj, dataJson, data;
 
 // selezionare un inseme di elementi e aggiungere a ognuno di essi un evento
 function addEventToButton(){
 
     const buttons = document.querySelectorAll('.bt');
-    
+
     for ( const button of buttons ) { button.addEventListener('click', fn); }
 }
 addEventToButton();
 
 function fn(e) {
-
 
     switch(e.target.id){
 
@@ -24,7 +23,7 @@ function fn(e) {
 
             e.preventDefault();
 
-            file = "signup.php";
+            file = "signup";
             name = document.querySelector('#name-signup').value;
             mail = document.querySelector('#email-signup').value;
             pass = document.querySelector('#password-signup').value;
@@ -38,111 +37,126 @@ function fn(e) {
 
             dataJson = JSON.stringify(dataObj); // converte l' array di oggetti in formato json
 
-            data = "signup="+dataJson; // aggiungere "jsonSelect=" prima della stringa json altrimenti in php l'array $_POST["jsonSelect"] non viene settato
-         
-            request(file , data)
-            .then((success)=>{
+            data = file+"="+dataJson; // aggiungere "jsonSelect=" prima della stringa json altrimenti in php l'array $_POST["jsonSelect"] non viene settato
 
-                console.log(success);
-                return requestTemplate('signup-email.tpl.html');
+            request(file , data)
+            .then((message)=>{
+
+                return requestTemplate('signup-email.tpl.html', message);
             })
             .then((html)=>{
 
                 console.log(html);
+
                 addEventToButton(); // console.log(2);
             })
-            .catch(obj => { console.log(obj[0]) })
+            .catch(error => { console.log(error) })
 
-                
-            //     const alerts = document.querySelectorAll(".alert");
-            //     for ( const a of alerts ) { a.hidden = true; }
-
-            //     for ( let i=0; i<obj.length; i++ ) {
-            //         // console.log(obj[i].status); //
-            //         // console.log(obj[i].error); //
-            //         // console.log(obj[i].message); //
-
-            //         const alert = document.querySelector(`.alert-${obj[i].error}`);
-            //         alert.hidden = false;
-            //         alert.innerHTML = obj[i].message;
-            //     }
-
-
-            //     // console.log(obj.status);
-            //     // console.log(obj.error);
-            //     // console.log(obj.message);
-              
-           
-
-            // });
         break;
 
 
 
         case "signin":  console.log("signin");
-        
+
             e.preventDefault();
 
-            file = "signin.php";
-           
+            file = "signin";
+
+            const token = document.querySelector('#token-signin').value;
             mail = document.querySelector('#email-signin').value;
             pass = document.querySelector('#password-signin').value;
-            
+
             dataObj = {
+                token: token,
                 mail: mail,
                 pass: pass
             }
-           
+
             dataJson = JSON.stringify(dataObj); // converte l' array di oggetti in formato json
-        
-            data = "signin="+dataJson; console.log(data);
 
-            request(file , data)   
-            .then((success)=>{
+            data = file+"="+dataJson; // console.log(data);
 
-                console.log(success);  console.log(1);
-                return loadTemplate('home.tpl.html');
+            request(file , data)
+            .then((message)=>{
+
+                return requestTemplate('home.tpl.html', message);
+            })
+            .then((message)=>{
+
+                console.log(message);
+                const el = document.querySelector(".message-template");
+                el.innerHTML = message;
+                addEventToButton();
+
+            })
+            .catch(err => console.log(err));
+        break;
+
+
+        case "verify": // console.log("verify");
+
+            e.preventDefault();
+
+            file = "verify";
+
+            mail = document.querySelector('#email-verify').value;
+
+            dataObj = { mail: mail }
+
+            dataJson = JSON.stringify(dataObj);
+
+            data = file+"="+dataJson; console.log(data);
+
+            request(file , data)
+            .then((message)=>{
+
+                return requestTemplate('verify.tpl.html', message);
             })
             .then((html)=>{
 
                 console.log(html);
-                addEventToButton(); console.log(2);
-             
+                addEventToButton();
             })
             .catch(err => console.log(err));
         break;
 
 
 
-        case "logout":   console.log("logout OK");
-        
-            e.preventDefault();  
+        case "logout":
 
-            file = "logout.php";
+            e.preventDefault();
 
-            request(file)
-            .then((success)=>{
+            file = "logout";
 
-                console.log(success);
-                return loadTemplate('signin-form.tpl.html');
-            }) 
-            .then((html)=>{
+            dataObj = { mail: "dan@mail.it" }
 
-                console.log(html);
-                addEventToButton(); console.log(2);
+            dataJson = JSON.stringify(dataObj);
+
+            data = file+"="+dataJson; console.log(data);
+
+            request(file, data)
+            .then((message)=>{
+
+                return requestTemplate('home.tpl.html', message);
+
+                // return requestTemplate('signin-form.tpl.html', message);
+            })
+            .then((message)=>{
+
+                console.log(message);
+                document.querySelector(".message-template").innerHTML = message;
+                addEventToButton();
             })
             .catch((err)=>console.log(err))
         break;
 
 
 
-        case "pass-emailform":  
-        
-            e.preventDefault(); 
+        case "pass-emailform":
 
-            console.log("passwordrecovery OK");
+            e.preventDefault();
 
-            file = "passrecovery.php";
+            file = "passrecovery";
             const template = "passrecovery.tpl.html";
 
             loadTemplate(template)
@@ -155,18 +169,16 @@ function fn(e) {
         break;
 
 
-        
-        case "pass-emailcheck":  
-        
-            e.preventDefault(); 
 
-            console.log("pass-emailcheck OK");
+        case "pass-emailcheck":
 
-            file = "pass-emailcheck.php";
+            e.preventDefault();
 
-           
+            file = "pass-emailcheck";
+
+
             mail = document.querySelector('#email-signup').value;
-           
+
             dataObj = { mail: mail };
 
             dataJson = JSON.stringify(dataObj); // converte l' array di oggetti in formato json
@@ -178,11 +190,11 @@ function fn(e) {
 
                 console.log(success);
                // return loadTemplate('signin-form.tpl.html');
-            }) 
+            })
             .then((html)=>{
 
                 console.log(html);
-                addEventToButton(); 
+                addEventToButton();
             })
             .catch((err)=>console.log(err))
         break;
@@ -191,20 +203,28 @@ function fn(e) {
 
 
         case "truncate":
-            file = "truncate.php";
+
+            file = "truncate";
+
             request(file)
-            .then((success)=>{
-                console.log(success);
+            .then((message)=>{
+
+                return requestTemplate('truncate.tpl.html', message);
             })
-            .catch(err => console.log(err));
+            .then((html)=>{
+
+                console.log(html);
+                addEventToButton();
+            })
+            .catch(obj => { console.log(obj[0]) })
         break;
 
 
 
-        case "type-signin":  console.log("type-signin"); 
+        case "type-signin":  console.log("type-signin");
 
             e.target.parentNode.classList.add("active");
-    
+
             document.getElementById("type-signup").parentNode.classList.remove("active");
 
             document.getElementById("form-signin").hidden = false;
@@ -218,7 +238,7 @@ function fn(e) {
             //e.preventDefault();
 
             e.target.parentNode.classList.add("active");
-    
+
             document.getElementById("type-signin").parentNode.classList.remove("active");
 
             document.getElementById("form-signin").hidden = true;
