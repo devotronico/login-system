@@ -1,0 +1,13 @@
+[
+    {
+        "date": "20190317212424",
+        "code": -20,
+        "status": "error",
+        "page": "signup",
+        "kind": "http",
+        "path": "C:\\xampp\\htdocs\\login-system\\src\\controller\\signup.php",
+        "file": "signup.php",
+        "line": 24,
+        "message": "Errore: variabile POST con indice signup non trovata"
+    }
+]

@@ -212,7 +212,7 @@ if ( $_GET["email"] && $_GET["hash"] ) {
 
                     <form id="form-signup" hidden>
                         <div class="form-group">
-                            <label for="name-signup">Name</label>
+                            <label for="name-signup" data-toggle="tooltip" data-placement="top" title="Non deve contenere i simboli: €#$%^&*()+=-[]';,./{}|:<>?~">Name</label>
                             <input type="text" class="form-control" id="name-signup" aria-describedby="nameHelp" placeholder="Enter name" autocomplete="username">
                             <div class="alert alert-danger alert-signup-name" role="alert" hidden></div>
                         </div>

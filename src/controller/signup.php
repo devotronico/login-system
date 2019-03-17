@@ -2,24 +2,29 @@
 
 if (!isset($_POST)) { header("Location: index.php"); die; }
 
-// header("Content-type: application/json"); // 'Content-Type', 'application/json;charset=utf-8;'
-header("Content-type: application/json;charset=utf-8;"); // 'Content-Type', 'application/json;charset=utf-8;'
+header("Content-type: application/json; charset=utf-8;"); 
 
-if (!file_exists("../helper/MyException.php")) {die('{ "code": "-20", "page": "signup", "status": "bug", "bug": "php", "message": "Errore: file MyException.php non trovato" }');}
+
+if (!file_exists("../helper/ExecutionTime.php")) { die('{ "code": "-20", "page": "signup", "status": "bug", "bug": "php", "message": "Errore: file ExecutionTime.php non trovato" }'); }
+require "../helper/ExecutionTime.php";
+
+$mark = new ExecutionTime();
+$mark->start();
+
+if (!file_exists("../helper/MyException.php")) { die('{ "code": "-20", "page": "signup", "status": "bug", "bug": "php", "message": "Errore: file MyException.php non trovato" }'); }
 require "../helper/MyException.php";
+
+if (!file_exists("../helper/Log.php")) { die('{ "code": "-20", "page": "signup", "status": "bug", "bug": "php", "message": "Errore: file Log.php non trovato" }'); }
+require "../helper/Log.php";
+
+
 
 try {
 
-if (!filter_has_var(INPUT_POST, "signup")) {
-    throw new MyException('Errore: variabile POST con indice signup non trovata', -20, null, 'http');
-   // die('{ "code": "-20", "page": "signup", "status": "bug", "bug": "http", "message": "variabile POST con indice signup non trovata"}');
-}
+if (!filter_has_var(INPUT_POST, "signupp")) { throw new MyException('Errore: variabile POST con indice signup non trovata', -20, null, 'http'); }
 
-// $file = basename(__FILE__); // DEBUG
-// die('{ "status": "test", "test": "Test: file '.$file.' - linea: '.__LINE__.'" }'); // DEBUG
 $str = $_POST["signup"];
 $page = key($_POST);
-//die('{ "page": "'.$page.'" }');
 
 
 /**
@@ -34,23 +39,17 @@ function isEmailStored($mysqli, $email) {
 
     $sql = "SELECT email FROM users WHERE email = ?";
 
-    if (!$stmt = $mysqli->prepare($sql)) { throw new MyException('Errore: mysqli_stmt::prepare', -30, null, 'mysqli');
-        // die('{ "page": "' . $page . '", "status": "bug", "bug": "mysqli", "message": "Errore: mysqli_stmt::prepare" }');
-     }
+    if (!$stmt = $mysqli->prepare($sql)) { throw new MyException('Errore: mysqli_stmt::prepare', -30, null, 'mysqli'); }
 
     $stmt->bind_param('s', $param);
 
     $param = $email;
 
-    if (!$stmt->execute()) { throw new MyException('Errore: mysqli_stmt::execute', -30, null, 'mysqli');
-        //die('{ "page": "' . $page . '", "status": "bug", "bug": "mysqli", "message": "Errore: mysqli_stmt::execute" }');
-    }
+    if (!$stmt->execute()) { throw new MyException('Errore: mysqli_stmt::execute', -30, null, 'mysqli'); }
 
     $stmt->store_result(); // [!] //$result = $stmt->get_result();
 
-    if ($stmt->num_rows > 0) { throw new MyException('Un account con L\' email <strong>' . $email . '</strong> è stata già registrata.', -10, null, 'email');
-        // die('{ "page": "' . $page . '", "status": "error", "error": "email", "message": "Un account con L\' email <strong>' . $email . '</strong> è stata già registrata." }');
-    }
+    if ($stmt->num_rows > 0) { throw new MyException('Un account con L\' email <strong>' . $email . '</strong> è stata già registrata.', -10, null, 'email'); }
 
     $stmt = null; // [!] $stmt->close();
 
@@ -75,15 +74,11 @@ function signup($mysqli, $name, $email, $password) {
     $hash = md5(strval(rand(0, 1000)));
     $verified = 0;
 
-    if (!$mysqli->ping()) { throw new MyException('Errore: mysqli_stmt::ping', -30, null, 'mysqli');
-      //  die('{ "page": "' . $page . '", "status": "bug", "bug": "mysqli", "message": "Errore: mysqli_stmt::ping" }');
-    }
+    if (!$mysqli->ping()) { throw new MyException('Errore: mysqli_stmt::ping', -30, null, 'mysqli'); }
 
     $sql = "INSERT INTO users ( status, name, email, password, registered, hash, verified ) VALUES ( ?, ?, ?, ?, ?, ?, ? )";
 
-    if (!$stmt = $mysqli->prepare($sql)) { throw new MyException('Errore: mysqli_stmt::prepare', -30, null, 'mysqli');
-       // die('{ "page": "' . $page . '", "status": "bug", "bug": "mysqli", "message": "Errore: mysqli_stmt::prepare" }');
-    }
+    if (!$stmt = $mysqli->prepare($sql)) { throw new MyException('Errore: mysqli_stmt::prepare', -30, null, 'mysqli'); }
 
         $stmt->bind_param('ssssssi', $param1, $param2, $param3, $param4, $param5, $param6, $param7);
 
@@ -95,9 +90,7 @@ function signup($mysqli, $name, $email, $password) {
         $param6 = $hash;
         $param7 = $verified;
 
-        if (!$stmt->execute()) { throw new MyException('Errore: mysqli_stmt::execute', -30, null, 'mysqli');
-            // die('{ "page": "'.$page.'", "status": "bug", "bug": "mysqli", "message": "Errore: mysqli_stmt::execute" }');
-        }
+        if (!$stmt->execute()) { throw new MyException('Errore: mysqli_stmt::execute', -30, null, 'mysqli'); }
 
         $stmt->close();
 
@@ -108,17 +101,13 @@ function signup($mysqli, $name, $email, $password) {
 
 
 
-if (!file_exists("../helper/Validation.php")) { throw new MyException('Errore: file Validation.php non trovato', -20, null, 'php');
-    // die('{ "page": "'.$page.'", "status": "bug", "bug": "php", "message": "Errore: file Validation.php non trovato" }');
-}
+if (!file_exists("../helper/Validation.php")) { throw new MyException('Errore: file Validation.php non trovato', -20, null, 'php'); }
 
 require "../helper/Validation.php";
 
-if (!class_exists("Validation")) { throw new MyException('Errore: classe Validation non trovata', -20, null, 'php');
-   // die('{ "page": "'.$page.'", "status": "bug", "bug": "php", "message": "Errore: classe Validation non trovata" }');
-}
+if (!class_exists("Validation")) { throw new MyException('Errore: classe Validation non trovata', -20, null, 'php'); }
 
-$obj = json_decode($str); // echo '<pre>';var_dump( $obj ); die;// object(stdClass)
+$obj = json_decode($str);
 
 $name = $obj->name;
 $email = $obj->mail;
@@ -134,41 +123,68 @@ $validation = new Validation(
 
 if ($validation->validate()) {
 
-    if (!file_exists("../../config/db.php")) { throw new MyException('Errore: file db.php non trovato', -20, null, 'php');
-        // die('{ "page": "'.$page.'", "status": "bug", "bug": "php", "message": "Errore: file db.php non trovato" }');
-    }
+    if (!file_exists("../../config/db.php")) { throw new MyException('Errore: file db.php non trovato', -20, null, 'php'); }
     require "../../config/db.php";
 
     if (!isEmailStored($mysqli, $email)) {
 
         $user = signup($mysqli, $name, $email, $password);
 
-        // SEND EMAIL
-        if (!file_exists('../model/EmailSubscription.php')) { throw new MyException('Errore: file EmailSubscription.php non trovato', -20, null, 'php');
-            //die('{ "page": "'.$page.'", "status": "bug", "bug": "php", "message": "Errore: file EmailSubscription.php non trovato" }');
-        }
+        if (!file_exists('../model/EmailSubscription.php')) { throw new MyException('Errore: file EmailSubscription.php non trovato', -20, null, 'php'); }
 
         require "../model/EmailSubscription.php";
 
-        if (!class_exists("EmailSubscription")) { throw new MyException('Errore: classe EmailSubscription non trovata', -20, null, 'php');
-            //die('{ "page": "'.$page.'", "status": "bug", "bug": "php", "message": "Errore: classe EmailSubscription non trovata" }');
-        }
+        if (!class_exists("EmailSubscription")) { throw new MyException('Errore: classe EmailSubscription non trovata', -20, null, 'php'); }
 
         $emailSubscription = new EmailSubscription($user);
 
         $emailSubscription->send();
 
-die('{ "code": "10", "page": "'.$page.'", "status": "success", "type": "registration", "message": "Per completare la registrazione ti è stata inviata un\' email al tuo indirizzo ' .$email . ', aprila e clicca sul link all\' interno" }');
-       // die('{ "code": "1", "page": "signup", "status": "bug", "bug": "php", "message": "Errore: file MyException.php non trovato" }');}
+        // <LOG>
+        $userData = [
+            "name" => $name,
+            "email" => $email,
+            "password" => $password
+        ];
+        $logB = Log::setSingleton();
+        $logB->createLogUser('user', $userData);
 
-        //die('{ "page": "'.$page.'", "status": "test", "test": "php", "message": "file ' . $file . ' - linea: ' . __LINE__ . '" }');
+
+        $mark->end();
+        $diff = $mark->diff();
+
+        $logC = Log::setSingleton();
+        $logC->createLogPerf('perf', $diff);
+         // </LOG>
+
+        die('{ "code": "10", "page": "'.$page.'", "status": "success", "type": "registration", "message": "Per completare la registrazione ti è stata inviata un\' email al tuo indirizzo ' .$email . ', aprila e clicca sul link all\' interno" }');
     }
 } else {
-    // $multimessageError = json_encode($validation->getAllErrors());
-    $multimessageError = $validation->getAllErrors();
-    throw new MyException($multimessageError, -15);
-}
-}  catch (MyException $e) {
 
-    echo $e->getMessage();
+    $multimessageError = $validation->getAllErrors();
+    throw new MyException($multimessageError, -15, null, 'validation');
 }
+}  catch (MyException $myException) {
+
+    if (!file_exists('../model/EmailSubscription.php')) { throw new MyException('Errore: file EmailSubscription.php non trovato', -20, null, 'php'); }
+
+    $data = $myException->getData();
+    $kind = $myException->getKind();
+
+    $logA = Log::setSingleton();
+    $logA->createLogError($kind, $data);
+
+    echo $myException->getMessage();
+}
+
+
+
+
+
+
+// echo '<pre>';var_dump( $obj ); die;// object(stdClass)
+// $file = basename(__FILE__); // DEBUG
+// die('{ "status": "test", "test": "Test: file '.$file.' - linea: '.__LINE__.'" }'); // DEBUG
+//die('{ "page": "'.$page.'", "status": "test", "test": "php", "message": "file ' . $file . ' - linea: ' . __LINE__ . '" }');
+// die('{ "status": "test", "root": "'.$_SERVER['DOCUMENT_ROOT'].'" }'); // DEBUG C:/xampp/htdocs
+// EOF

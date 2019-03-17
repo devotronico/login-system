@@ -89,6 +89,14 @@ class Validation
      * prima e dopo la chiocciola  @()[]:<>\"
      * prima della chiocciola      @()[]:<>\"
      * dopo la chiocciola          @$%&'*+/=?^_`{|}~()[]:<>\"
+     * 
+     * TEST
+     * Carattere 	Valido			        Non valido 	    Info
+     * #	  	    #da#s@mail.it		    dan@mail.i#t	non deve stare dopo il carattere @
+     * @			                        d@an@mail.it  	può esserci solo un carattere @
+     * []					                d[an@mail.it 	mai valido
+     * (		    (1)((@)2().())a)))()			        vengono rimosse le parentesi da FILTER_SANITIZE_EMAIL
+     * )		    (f)((@)a().())t)))()			        vengono rimosse le parentesi da FILTER_SANITIZE_EMAIL
      */
     private function validateEmail($email){
         $email = trim($email);
@@ -143,12 +151,13 @@ class Validation
             $this->message[] = ['type' => 'name', 'message' => 'Il campo nome è vuoto'];
         } else {
             // $illegal = "/\W/";
-            $illegal = "/\€/";
-           // $illegal = "@[\€\#\$\%\@\^\&\*\(\)\+\=\-\[\]\'\;\,\.\/\{\}\|\:\<\>\?\~]@";
+            // $illegal = "/\€/";
+           $illegal = "/[\€\#\$\%\@\^\&\*\(\)\+\=\-\[\]\'\;\,\.\/\{\}\|\:\<\>\?\~]/u";
             if (preg_match_all($illegal, $name, $output_array)) {
 
                 $char_listA = $output_array[0];
 
+/*
                 $fn = function (string $char) {
 
                    // return (string)$char;
@@ -159,10 +168,11 @@ class Validation
                 };
 
                 $char_listB = array_map($fn, $char_listA);
+                */
 
 
 
-                $chars = '<b>' .implode('</b> , <b>', $char_listB) . '</b>';
+                $chars = '<b>' .implode('</b> , <b>', $char_listA) . '</b>';
                // $chars = utf8_encode((string)$chars);
                 if (count( $output_array[0]) > 1) {
 
